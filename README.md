@@ -69,6 +69,25 @@ app
 
 ---
 
+## Sample Input
+```text
+1
+Salary
+20000
+
+2
+Food
+3000
+
+2
+Shopping
+2500
+
+5
+```
+
+---
+
 ## Sample Output
 ```text
 ============================================
@@ -156,14 +175,26 @@ Needs Better Expense Control!
 
 ---
 
+## Future Enhancements
+- Add password protection for users
+- Generate monthly financial reports
+- Add graphical expense visualization
+- Store data using databases
+- Export reports as PDF or Excel files
+- Add multiple user accounts
+- Develop a GUI version of the application
+- Add AI-based budget prediction system
+
+---
+
+## About
+Smart Expense Tracker & Budget Optimizer using C++ and file handling to manage income, expenses, spending analysis, financial health score, and budget suggestions. Features dynamic expense categories, percentage analysis, and highest/lowest spending category detection.
+
+---
+
 ## Team Members
 - 25A31A4334 : SHAIK TAZMEEN RIDA
 - 25A31A4318 : MOHAMMAD DHANIYA FATHIMA
 - 25A31A4332 : SABBATHI PAVANI
 - 25A31A4364 : VANASI GOWTHAM
 - 25A31A4342 : JANAPAREDDY JASWANTH
-
----
-
-## About
-Smart Expense Tracker & Budget Optimizer using C++ and file handling to manage income, expenses, spending analysis, financial health score, and budget suggestions. Features dynamic expense categories, percentage analysis, and highest/lowest spending category detection.
