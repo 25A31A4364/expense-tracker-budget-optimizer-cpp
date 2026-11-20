@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#172554">
+<title>Expense Tracker & Budget Optimizer</title>
+<style>
+:root{--navy:#172554;--blue:#3156d8;--ink:#172033;--muted:#64748b;--line:#e5eaf2;--bg:#f4f6fb;--white:#fff;--green:#087f5b;--red:#c2413b;--amber:#a16207;--shadow:0 12px 35px rgba(23,37,84,.07)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+header{background:linear-gradient(120deg,#172554,#263f91);color:white;padding:34px 20px 54px}
+.header-inner,.app{max-width:1080px;margin:auto}
+.eyebrow{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#c7d2fe;font-weight:700}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.12;margin:8px 0}
+header p{color:#dbe4ff;margin:10px 0 0;max-width:650px}
+.app{padding:0 20px 48px;margin-top:-28px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card,.metric{background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.metric{padding:19px 20px}
+.metric .label{font-size:13px;color:var(--muted)}
+.metric .value{font-size:26px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
+.metric.income .value{color:var(--green)}.metric.expense .value{color:var(--red)}
+.layout{display:grid;grid-template-columns: minmax(280px,.85fr) minmax(0,1.5fr);gap:16px;margin-top:16px}
+.card{padding:21px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 15px}
+h3{font-size:15px;margin:0 0 10px}
+.field{margin-bottom:13px}
+label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}
+input,select{width:100%;border:1px solid #d8dfeb;border-radius:9px;background:white;padding:11px 12px;color:var(--ink);outline:none}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #3156d81c}
+button{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;transition:.15s}
+button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.primary{background:var(--blue);color:white;width:100%}.primary:hover{background:#2446bd}
+.secondary{background:#eef2ff;color:#263f91}.danger{background:#fff0ef;color:var(--red)}
+.button-row{display:flex;gap:8px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted);margin:9px 0 0}
+.tabs{display:flex;gap:7px;margin-bottom:15px}
+.tab{background:#f1f4f9;color:#526078;flex:1}
+.tab.active{background:#e8edff;color:#2446bd}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:420px}
+th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line);font-size:13px}
+th{color:var(--muted);font-weight:650}
+td.amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+th:last-child{text-align:right}
+td:last-child{text-align:right}
+.pill{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:700}
+.pill.in{background:#e7f7f0;color:var(--green)}.pill.out{background:#fff0ef;color:var(--red)}
+.empty{text-align:center;color:var(--muted);padding:26px 10px}
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{padding:13px;background:#f7f8fc;border-radius:11px}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat strong{display:block;margin-top:3px;overflow-wrap:anywhere}
+.category-list{display:grid;gap:12px;margin-top:16px}
+.category-top{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.track{height:8px;border-radius:99px;background:#e9edf5;margin-top:6px;overflow:hidden}
+.fill{height:100%;border-radius:99px;background:var(--blue)}
+.notice{padding:12px 14px;border-radius:10px;background:#f5f7ff;color:#334477;font-size:13px;margin-top:12px}
+.notice.warn{background:#fff7e8;color:#854d0e}.notice.good{background:#eaf8f1;color:#086447}
+.score-row{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:15px;padding:15px;border:1px solid var(--line);border-radius:12px}
+.score{font-size:27px;font-weight:800;color:var(--navy)}
+footer{color:var(--muted);font-size:12px;text-align:center;margin:18px 0 0}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.metric{padding:15px}.metric .value{font-size:23px}}
+@media(max-width:420px){.analysis-grid{grid-template-columns:1fr}.card{padding:17px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">Personal finance tool</div>
+    <h1>Expense Tracker &amp; Budget Optimizer</h1>
+    <p>Record income and expenses, see where your money goes, and get simple spending insights.</p>
+  </div>
+</header>
+<main class="app">
+  <section class="metrics" aria-label="Financial summary">
+    <div class="metric income"><div class="label">Total income</div><div class="value" id="totalIncome">₹0.00</div></div>
+    <div class="metric expense"><div class="label">Total expenses</div><div class="value" id="totalExpense">₹0.00</div></div>
+    <div class="metric"><div class="label">Current balance</div><div class="value" id="balance">₹0.00</div></div>
+  </section>
+
+  <div class="layout">
+    <section>
+      <div class="card">
+        <h2>Add a transaction</h2>
+        <div class="tabs" role="group" aria-label="Transaction type">
+          <button class="tab active" id="incomeTab" type="button" aria-pressed="true">Income</button>
+          <button class="tab" id="expenseTab" type="button" aria-pressed="false">Expense</button>
+        </div>
+        <form id="transactionForm">
+          <div class="field"><label for="category">Category</label><input id="category" maxlength="40" placeholder="e.g. Salary, Food, Travel" required></div>
+          <div class="field"><label for="amount">Amount (₹)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="Enter amount" required></div>
+          <button class="primary" type="submit">Add transaction</button>
+        </form>
+        <p class="hint">Your transactions are saved in this browser on this device.</p>
+      </div>
+      <div class="card">
+        <h2>Data management</h2>
+        <div class="button-row">
+          <button class="secondary" id="exportBtn" type="button">Export transactions</button>
+          <button class="danger" id="clearBtn" type="button">Clear all data</button>
+        </div>
+        <p class="hint">Export a backup as a JSON file. Clearing data cannot be undone unless you have a backup.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="card">
+        <h2>Transaction history</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Type</th><th>Category</th><th class="amount">Amount</th><th></th></tr></thead>
+            <tbody id="transactionRows"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="emptyState">No transactions yet. Add your first income or expense.</div>
+      </div>
+
+      <div class="card">
+        <h2>Smart budget analysis</h2>
+        <div class="analysis-grid">
+          <div class="stat"><small>Highest spending category</small><strong id="highestCategory">—</strong></div>
+          <div class="stat"><small>Amount spent there</small><strong id="highestAmount">₹0.00</strong></div>
+          <div class="stat"><small>Lowest spending category</small><strong id="lowestCategory">—</strong></div>
+          <div class="stat"><small>Amount spent there</small><strong id="lowestAmount">₹0.00</strong></div>
+        </div>
+        <div class="category-list" id="categoryBreakdown"></div>
+        <div id="suggestion" class="notice">Add expenses to see your spending suggestions.</div>
+        <div id="spendingWarning"></div>
+        <div class="score-row">
+          <div><strong>Financial health score</strong><div class="hint">Simple project score based on total recorded expenses</div></div>
+          <div class="score"><span id="healthScore">100</span><small style="font-size:13px;color:#64748b">/100</small></div>
+        </div>
+        <div class="hint">This score follows the original project's formula: 100 − (total expenses ÷ 100), rounded down and limited to a minimum of 0. It is an illustrative rule, not a validated financial-health measure.</div>
+      </div>
+    </section>
+  </div>
+  <footer>Demo based on a C++ group project. Transactions are stored locally in this browser and are not uploaded to a server.</footer>
+</main>
+<script>
+"use strict";
+const STORAGE_KEY = "expenseTrackerBudgetOptimizer.v1";
+let transactions = [];
+let currentType = "Income";
+
+const $ = id => document.getElementById(id);
+const money = value => "₹" + value.toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+
+function loadTransactions() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        transactions = parsed.filter(t =>
+          t && (t.type === "Income" || t.type === "Expense") &&
+          typeof t.category === "string" &&
+          Number.isFinite(t.amount) && t.amount > 0
+        );
+      }
+    }
+  } catch (error) {
+    transactions = [];
+    $("suggestion").textContent = "Saved browser data could not be read. You can continue with new transactions.";
+  }
+}
+function saveTransactions() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  } catch (error) {
+    alert("The browser could not save your data. Try exporting a backup or freeing browser storage.");
+  }
+}
+function setType(type) {
+  currentType = type;
+  $("incomeTab").classList.toggle("active", type === "Income");
+  $("expenseTab").classList.toggle("active", type === "Expense");
+  $("incomeTab").setAttribute("aria-pressed", String(type === "Income"));
+  $("expenseTab").setAttribute("aria-pressed", String(type === "Expense"));
+}
+$("incomeTab").addEventListener("click", () => setType("Income"));
+$("expenseTab").addEventListener("click", () => setType("Expense"));
+
+$("transactionForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const category = $("category").value.trim();
+  const amount = Number($("amount").value);
+  if (!category || !Number.isFinite(amount) || amount <= 0) {
+    alert("Please enter a category and an amount greater than zero.");
+    return;
+  }
+  transactions.push({type: currentType, category, amount});
+  saveTransactions();
+  $("transactionForm").reset();
+  $("category").focus();
+  render();
+});
+
+function addCell(row, text, className) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  if (className) cell.className = className;
+  row.appendChild(cell);
+  return cell;
+}
+function renderHistory() {
+  const body = $("transactionRows");
+  body.replaceChildren();
+  $("emptyState").hidden = transactions.length !== 0;
+  transactions.forEach((t, index) => {
+    const row = document.createElement("tr");
+    const typeCell = addCell(row, t.type);
+    const pill = document.createElement("span");
+    pill.className = "pill " + (t.type === "Income" ? "in" : "out");
+    pill.textContent = t.type;
+    typeCell.replaceChildren(pill);
+    addCell(row, t.category);
+    addCell(row, money(t.amount), "amount");
+    const actionCell = addCell(row, "");
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "danger";
+    remove.textContent = "Remove";
+    remove.setAttribute("aria-label", "Remove " + t.type + " transaction for " + t.category);
+    remove.addEventListener("click", () => {
+      transactions.splice(index, 1);
+      saveTransactions();
+      render();
+    });
+    actionCell.appendChild(remove);
+    body.appendChild(row);
+  });
+}
+function renderAnalysis(expenseTotals, totalExpense) {
+  const categories = Object.keys(expenseTotals);
+  $("categoryBreakdown").replaceChildren();
+  if (!categories.length || totalExpense <= 0) {
+    $("highestCategory").textContent = "—";
+    $("lowestCategory").textContent = "—";
+    $("highestAmount").textContent = money(0);
+    $("lowestAmount").textContent = money(0);
+    $("suggestion").className = "notice";
+    $("suggestion").textContent = "No expense data available. Add an expense to see category-wise analysis.";
+    $("spendingWarning").replaceChildren();
+  } else {
+    let highest = categories[0], lowest = categories[0];
+    categories.forEach(category => {
+      if (expenseTotals[category] > expenseTotals[highest]) highest = category;
+      if (expenseTotals[category] < expenseTotals[lowest]) lowest = category;
+    });
+    $("highestCategory").textContent = highest;
+    $("lowestCategory").textContent = lowest;
+    $("highestAmount").textContent = money(expenseTotals[highest]);
+    $("lowestAmount").textContent = money(expenseTotals[lowest]);
+
+    categories.forEach(category => {
+      const percentage = expenseTotals[category] / totalExpense * 100;
+      const wrapper = document.createElement("div");
+      const top = document.createElement("div");
+      top.className = "category-top";
+      const name = document.createElement("strong");
+      name.textContent = category;
+      const amount = document.createElement("span");
+      amount.textContent = money(expenseTotals[category]) + " · " + percentage.toFixed(1) + "%";
+      top.append(name, amount);
+      const track = document.createElement("div");
+      track.className = "track";
+      const fill = document.createElement("div");
+      fill.className = "fill";
+      fill.style.width = Math.min(100, percentage) + "%";
+      track.appendChild(fill);
+      wrapper.append(top, track);
+      $("categoryBreakdown").appendChild(wrapper);
+    });
+
+    const share = expenseTotals[highest] / totalExpense * 100;
+    $("suggestion").className = share > 40 ? "notice warn" : "notice good";
+    $("suggestion").textContent = share > 40
+      ? "Suggestion: Try reducing expenses in " + highest + ". It accounts for " + share.toFixed(1) + "% of your recorded expenses."
+      : "Your spending is balanced according to this project's 40% category threshold.";
+
+    const warning = document.createElement("div");
+    warning.className = totalExpense > 5000 ? "notice warn" : "notice";
+    warning.textContent = totalExpense > 5000
+      ? "Warning: Total recorded spending is above ₹5,000."
+      : "Total recorded spending is not above the ₹5,000 threshold.";
+    $("spendingWarning").replaceChildren(warning);
+  }
+  // Preserve the original C++ formula and its integer conversion behavior.
+  let score = Math.max(0, Math.trunc(100 - totalExpense / 100));
+  $("healthScore").textContent = String(score);
+}
+function render() {
+  let income = 0, expense = 0;
+  const expenseTotals = Object.create(null);
+  transactions.forEach(t => {
+    if (t.type === "Income") income += t.amount;
+    else {
+      expense += t.amount;
+      expenseTotals[t.category] = (expenseTotals[t.category] || 0) + t.amount;
+    }
+  });
+  $("totalIncome").textContent = money(income);
+  $("totalExpense").textContent = money(expense);
+  $("balance").textContent = money(income - expense);
+  renderHistory();
+  renderAnalysis(expenseTotals, expense);
+}
+$("clearBtn").addEventListener("click", () => {
+  if (!transactions.length) return;
+  if (confirm("Delete all saved transactions from this browser? This cannot be undone unless you exported a backup.")) {
+    transactions = [];
+    saveTransactions();
+    render();
+  }
+});
+$("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({project:"Expense Tracker & Budget Optimizer", exportedAt:new Date().toISOString(), transactions}, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "expense-tracker-backup.json";
+  link.click();
+  URL.revokeObjectURL(url);
+});
+loadTransactions();
+render();
+</script>
+</body>
+</html>
